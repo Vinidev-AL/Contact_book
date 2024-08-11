@@ -20,7 +20,7 @@
 	
 	// Funções principais
 	void AdicionarContato(Contato *listaContatos, int *tamanho_lista);
-	void BuscarContato(Contato *listaContatos, int *tamanho_lista);
+	void BuscarContato(Contato *listaContatos, int tamanho_lista);
 	void AtualizarContato();
 	void RemoverContato();
 
@@ -33,5 +33,10 @@
 		// Função para verificar se é número
 		void VerificarSeNumero(char *digitado, bool *letra, int *valorRetornado);
 		
+		// Função converter string para minusculo
+		void converter_minusculo(char *str);
+		
+		// Função para remover \n gerado pelo fgets
+		void removerNovaLinha(char *str);
 
 #endif

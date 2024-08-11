@@ -47,7 +47,7 @@ int main() {
 					}
 					case 2: {
 						loop = false;
-						BuscarContato(listaContatos, &tamanho_lista);
+						BuscarContato(listaContatos, tamanho_lista);
 						break;
 					}
 					case 3: {

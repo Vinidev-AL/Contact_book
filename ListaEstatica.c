@@ -22,6 +22,12 @@
 		printf("\n\n\n");
 	}
 	
+	// Função limpar o buffer do teclado
+	void limpar_buffer() {
+    	 int c;
+    	 while ((c = getchar()) != '\n' && c != EOF);
+	}
+	
 	
 	// Função para verificar se é número, caso seja letra, altera o valor de letra para "true"
 	void VerificarSeNumero(char *digitado, bool *letra, int *valorRetornado) {
@@ -70,9 +76,15 @@
 
 // Funções principais
 
-	void AdicionarContato(Contato *listaContatos, int *tamanho_lista) {
+	void AdicionarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta) {
+		
+		// Guia: 
+		   // Função removerNovaLinha, tira o \n do final das strings lidas pelo fgets.
+		   // LineBreak equivale a \n.
+		
 		Contato contato;
 		
+		// Verifica de a lista já atingiu o tamanho máximo, caso seja true, cai no else.
 		if (*tamanho_lista <= TAM_MAX) {
 			printf("Digite o nome do contato: "); 
 			fflush(stdin);
@@ -95,35 +107,55 @@
 			fgets(contato.email, sizeof(contato.email), stdin);
 			removerNovaLinha(contato.email);	
 			
+			contato.id = *tamanho_lista + 1;
+			
+			// O array que guarda os contatos recebe o novo contato na posição apontada pela variavel "tamanho_lista".
 			listaContatos[*tamanho_lista] = contato;
-			tamanho_lista += 1;
+			*tamanho_lista += 1;
+			
+			
+			// Substitui a variavel status pela resposta da "requisição"
+			strcpy(status, "Contato criado com sucesso!");
+			*codigoDeResposta = 2;
+			
+			system("cls");
 		} 
 		else{
-			printf("Máximo de contatos atingido.");
+			// Substitui a variavel status pela resposta da "requisição"
+			strcpy(status, "Máximo de contatos atingido.");
+			*codigoDeResposta = 1;
+			system("cls");
 		}
 	}
 	
-	void BuscarContato(Contato *listaContatos, int *tamanho_lista) {
+	void BuscarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta) {
 		int i, vef = 0, tam_array_contatos_encontrados = 0;
+		
+		// String que guarda o valor digitado pelo usuário
 		char busca[TAM_MAX];
+		
+		// Array que guarda temporariamente os contato encontrados
 		Contato ContatosEncontrados[TAM_MAX];
 		
-		printf("Digite o nome do contato ou o telefone: ");
+		printf("Para pesquisar todos os contatos, deixe em branco, ou"); LineBreak1();
+		printf("Digite o nome, telefone ou email do contato: ");
 		fgets(busca, sizeof(busca), stdin);	
 		removerNovaLinha(busca);
 	
 	
 
-		for(i=0;i<= *tamanho_lista; i++){
+		for(i=0;i <= *tamanho_lista; i++){
 			
 			char nome[TAM_MAX];
 			char ddd[TAM_MAX];
 			char telefone[30];
 			char telefoneCompleto[TAM_MAX];
+			char email[TAM_MAX_255];
 			
 			strcpy(nome, listaContatos[i].nome);
 			strcpy(ddd, listaContatos[i].telefone.ddd);
 			strcpy(telefone, listaContatos[i].telefone.numero);
+			strcpy(email, listaContatos[i].email);
 			
 	
 			strcat(ddd, telefone);
@@ -131,48 +163,403 @@
 			
 			converter_minusculo(busca);
 			converter_minusculo(nome);
-			converter_minusculo(telefoneCompleto);		
+			converter_minusculo(telefoneCompleto);	
+			converter_minusculo(email);	
 				
-			if (strcmp(busca, nome) == 0){
+			if (strstr(nome, busca) != NULL){
 				// Achou o contato pelo nome
-				printf("Achou pelo nome");
-				ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
-				tam_array_contatos_encontrados++;
-				vef = 1;
+				
+				if(listaContatos[i].id !=0){
+					LineBreak1();
+					ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+					tam_array_contatos_encontrados += 1;
+					vef = 1;
+				}
 			} 
 			else {
-				 if (strcmp(busca, telefoneCompleto) == 0){
+				 if (strstr(telefoneCompleto, busca) != NULL){
 				 	// Achou o contato pelo telefone
-				 	printf("Achou pelo telefone");
-					ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
-					tam_array_contatos_encontrados++;				 	
-				 	vef = 1;
+					if(listaContatos[i].id !=0){
+						LineBreak1();
+						ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+						tam_array_contatos_encontrados += 1;
+						vef = 1;
+					}			 	
+
+				 }
+				 else{
+				 	if (strstr(email, busca) != NULL) {
+				 		//Achou pelo email
+						if(listaContatos[i].id !=0){
+							LineBreak1();
+							ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+							tam_array_contatos_encontrados += 1;
+							vef = 1;
+						}					 		
+					 }
 				 }
 			}			
 		}
 		
 		if(vef != 1){
-			printf("Nenhum contato encontrado!"); LineBreak1();
+			system("cls");
+			strcpy(status, "Nenhum contato encontrado!");
+			*codigoDeResposta = 1;
 		}
 		else{
-			printf("veja os contatos encontrados");
+			system("cls");
+			strcpy(status, "Busca realizada!");
+			*codigoDeResposta = 2;
+			printf("Resultado: "); LineBreak2();
    			for (i = 0; i < tam_array_contatos_encontrados; i++) {
-   		 		printf("Nome: %s, Telefone: %s%s, e-mail: %s\n",
+   				if (ContatosEncontrados[i].nome == '\0'){
+   					
+			   }
+			   
+			   else {
+ 
+   		 		printf("{\nNome: %s\nTelefone: %s%s\ne-mail: %s\nID: %d\n}\n",
                 ContatosEncontrados[i].nome,
                 ContatosEncontrados[i].telefone.ddd,
                 ContatosEncontrados[i].telefone.numero,
-                ContatosEncontrados[i].email);
-        }
+                ContatosEncontrados[i].email,
+                ContatosEncontrados[i].id);       
+            }
+        	}
+        	system("pause");
 		}
 
 	}
 	
-	void AtualizarContato() {
-		printf("Atualizar contato");
+	void AtualizarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta) {
+		strcpy(status, "");
+		int i, vef = 0, tam_array_contatos_encontrados = 0, ID, opc;
+		bool vef_atualizar = true;
+		
+		// String que guarda o valor digitado pelo usuário
+		char busca[TAM_MAX];
+		
+		// Array que guarda temporariamente os contato encontrados
+		Contato ContatosEncontrados[TAM_MAX];
+		
+		printf("Digite o nome, telefone ou email do contato: ");
+		fgets(busca, sizeof(busca), stdin);	
+		removerNovaLinha(busca);
+	
+	
+
+		for(i=0;i <= *tamanho_lista; i++){
+			
+			char nome[TAM_MAX];
+			char ddd[TAM_MAX];
+			char telefone[30];
+			char telefoneCompleto[TAM_MAX];
+			char email[TAM_MAX_255];
+			
+			strcpy(nome, listaContatos[i].nome);
+			strcpy(ddd, listaContatos[i].telefone.ddd);
+			strcpy(telefone, listaContatos[i].telefone.numero);
+			strcpy(email, listaContatos[i].email);
+			
+	
+			strcat(ddd, telefone);
+			strcpy(telefoneCompleto, ddd);
+			
+			converter_minusculo(busca);
+			converter_minusculo(nome);
+			converter_minusculo(telefoneCompleto);	
+			converter_minusculo(email);	
+				
+			if (strstr(nome, busca) != NULL){
+				// Achou o contato pelo nome
+				if(listaContatos[i].id !=0){
+					LineBreak1();
+					ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+					tam_array_contatos_encontrados += 1;
+					vef = 1;
+				}
+			} 
+			else {
+				 if (strstr(telefoneCompleto, busca) != NULL){
+				 	// Achou o contato pelo telefone
+					if(listaContatos[i].id !=0){
+						LineBreak1();
+						ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+						tam_array_contatos_encontrados += 1;
+						vef = 1;
+					}
+				 }
+				 else{
+				 	if (strstr(email, busca) != NULL) {
+				 		//Achou pelo email
+						if(listaContatos[i].id !=0){
+							LineBreak1();
+							ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+							tam_array_contatos_encontrados += 1;
+							vef = 1;
+						}				 		
+					 }
+				 }
+			}			
+		}
+		
+		if(vef != 1){
+			system("cls");
+			strcpy(status, "Nenhum contato encontrado!");
+			*codigoDeResposta = 1;
+		}
+		else{
+			system("cls");
+			strcpy(status, "Busca realizada!");
+			*codigoDeResposta = 2;
+			printf("Resultado: "); LineBreak2();
+   			for (i = 0; i < tam_array_contatos_encontrados; i++) {
+   		 		printf("{\nNome: %s\nTelefone: %s%s\ne-mail: %s\nID: %d\n}\n",
+                ContatosEncontrados[i].nome,
+                ContatosEncontrados[i].telefone.ddd,
+                ContatosEncontrados[i].telefone.numero,
+                ContatosEncontrados[i].email,
+                ContatosEncontrados[i].id);
+        	}	
+			
+			printf("Digite o ID do contato que deseja atualizar: ");
+			scanf("%d", &ID);
+			ID = ID-1;
+			limpar_buffer();
+			LineBreak2();
+			
+			printf("Contato de ID %d tem as seguintes informações: ", ID+1);
+			LineBreak2();
+			
+			if (listaContatos[ID].telefone.ddd[0] == '\0'){
+				strcpy(status, "Esse contato não existe ou está em branco");	
+			}
+			
+			else {
+			
+   		 		printf("{\nNome: %s\nTelefone: %s%s\ne-mail: %s\nID: %d\n}\n",
+                listaContatos[ID].nome,
+                listaContatos[ID].telefone.ddd,
+                listaContatos[ID].telefone.numero,
+                listaContatos[ID].email,
+                listaContatos[ID].id);	
+						
+			LineBreak1();
+			
+			while(vef_atualizar != false) {
+
+				printf("Selecione a opção desejada");
+				LineBreak1();
+				printf("[1] - Atualizar nome"); LineBreak1();
+				printf("[2] - Atualizar telefone"); LineBreak1();
+				printf("[3] - Atualizar email"); LineBreak1();
+				printf("[4] - Voltar"); LineBreak1();	
+				
+				printf("-> ");
+				scanf("%d", &opc);
+				limpar_buffer();
+				
+				switch(opc){
+					case 1: {
+						printf("Digite o nome atualizado: ");
+						fflush(stdin);
+						fgets(listaContatos[ID].nome, sizeof(listaContatos[ID].nome), stdin);
+						removerNovaLinha(listaContatos[ID].nome);
+						strcpy(status, "Contato atualizado!");
+						*codigoDeResposta = 2;
+						break;
+					}
+					
+					case 2: {
+						printf("Digite o DDD atualizado: ");
+						fflush(stdin);
+						fgets(listaContatos[ID].telefone.ddd, sizeof(listaContatos[ID].telefone.ddd), stdin);
+						removerNovaLinha(listaContatos[ID].telefone.ddd);	
+						LineBreak1();
+						printf("Digite o número atualizado: ");
+						fflush(stdin);
+						fgets(listaContatos[ID].telefone.numero, sizeof(listaContatos[ID].telefone.numero), stdin);	
+						removerNovaLinha(listaContatos[ID].telefone.numero);	
+						strcpy(status, "Contato atualizado!");	
+						*codigoDeResposta = 2;								
+						break;
+					}
+					
+					case 3: {
+						printf("Digite o email atualizado: ");
+						fflush(stdin);
+						fgets(listaContatos[ID].email, sizeof(listaContatos[ID].nome), stdin);	
+						removerNovaLinha(listaContatos[ID].email);	
+						strcpy(status, "Contato atualizado!");	
+						*codigoDeResposta = 2;			
+						break;
+					}
+					
+					case 4: {
+						vef_atualizar = false;
+						break;
+					}
+				}							
+			}
+		}
+		}
 	}
 	
-	void RemoverContato() {
-		printf("Remover contato");
+	void RemoverContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta) {
+		strcpy(status, "");
+		int i, vef = 0, tam_array_contatos_encontrados = 0, ID, opc, valorRetornado;;
+		bool vef_atualizar = true, letra = false, loop = true;
+		
+		char apagaOuNao[TAM_MAX];
+		
+		// String que guarda o valor digitado pelo usuário
+		char busca[TAM_MAX];
+		
+		// Array que guarda temporariamente os contato encontrados
+		Contato ContatosEncontrados[TAM_MAX];
+		
+		printf("Digite o nome, telefone ou email do contato: ");
+		fgets(busca, sizeof(busca), stdin);	
+		removerNovaLinha(busca);
+	
+	
+
+		for(i=0;i <= *tamanho_lista; i++){
+			
+			char nome[TAM_MAX];
+			char ddd[TAM_MAX];
+			char telefone[30];
+			char telefoneCompleto[TAM_MAX];
+			char email[TAM_MAX_255];
+			
+			strcpy(nome, listaContatos[i].nome);
+			strcpy(ddd, listaContatos[i].telefone.ddd);
+			strcpy(telefone, listaContatos[i].telefone.numero);
+			strcpy(email, listaContatos[i].email);
+			
+	
+			strcat(ddd, telefone);
+			strcpy(telefoneCompleto, ddd);
+			
+			converter_minusculo(busca);
+			converter_minusculo(nome);
+			converter_minusculo(telefoneCompleto);	
+			converter_minusculo(email);	
+				
+			if (strstr(nome, busca) != NULL){
+				// Achou o contato pelo nome
+				LineBreak1();
+				ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+				tam_array_contatos_encontrados += 1;
+				vef = 1;
+			} 
+			else {
+				 if (strstr(telefoneCompleto, busca) != NULL){
+				 	// Achou o contato pelo telefone
+				 	LineBreak1();
+					ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+					tam_array_contatos_encontrados += 1;				 	
+				 	vef = 1;
+				 }
+				 else{
+				 	if (strstr(email, busca) != NULL) {
+				 		//Achou pelo email
+				 		LineBreak1();
+						ContatosEncontrados[tam_array_contatos_encontrados] = listaContatos[i];
+						tam_array_contatos_encontrados += 1;				 	
+					 	vef = 1;				 		
+					 }
+				 }
+			}			
+		}
+		
+		if(vef != 1){
+			system("cls");
+			strcpy(status, "Nenhum contato encontrado!");
+			*codigoDeResposta = 1;
+		}
+		else{
+			system("cls");
+			printf("Resultado: "); LineBreak2();
+   			for (i = 0; i < tam_array_contatos_encontrados; i++) {
+   		 		printf("{\nNome: %s\nTelefone: %s%s\ne-mail: %s\nID: %d\n}\n",
+                ContatosEncontrados[i].nome,
+                ContatosEncontrados[i].telefone.ddd,
+                ContatosEncontrados[i].telefone.numero,
+                ContatosEncontrados[i].email,
+                ContatosEncontrados[i].id);
+        	}	
+			
+			printf("Digite o ID do contato que deseja remover: ");
+			scanf("%d", &ID);
+			limpar_buffer();
+			LineBreak2();
+			ID = ID-1;
+			
+			printf("Contato de ID %d tem as seguintes informações: ", ID+1);
+			LineBreak2();
+			
+			if (listaContatos[ID].telefone.ddd[0] == '\0'){
+				strcpy(status, "Esse contato não existe ou está em branco");	
+			}
+			
+			else {
+			
+   		 		printf("{\nNome: %s\nTelefone: %s%s\ne-mail: %s\nID: %d\n}\n",
+                listaContatos[ID].nome,
+                listaContatos[ID].telefone.ddd,
+                listaContatos[ID].telefone.numero,
+                listaContatos[ID].email,
+                listaContatos[ID].id);	
+						
+			LineBreak1();
+			
+			printf("Deseja realmente apagar?");
+			LineBreak1();
+			
+			printf("[1] - SIM");LineBreak1();
+			printf("[2] - NÃO");LineBreak1();
+			printf("-> ");
+			
+		do {
+			fflush(stdin);
+			fgets(apagaOuNao, sizeof(apagaOuNao), stdin);
+			VerificarSeNumero(apagaOuNao, &letra, &valorRetornado); // Essa função verifica se a pessoa digitou relamente um número, se for número, letra retorna false.
+			
+			
+			if (letra != true){ // Se letra for false, ele executa o código, caso contrário, cai no else.
+				switch(valorRetornado){
+					case 1:  {
+					strcpy(status, "Contato removido!");
+					*codigoDeResposta = 2;
+						loop = false;
+						listaContatos[ID].nome[0] = '\0';
+						listaContatos[ID].telefone.ddd[0] = '\0';
+						listaContatos[ID].telefone.numero[0] = '\0';
+						listaContatos[ID].email[0] = '\0';
+						listaContatos[ID].id = 0;
+					}
+					case 2: {
+						loop = false;
+						return;
+						break;
+					}
+				
+					default: {
+						printf("Número inválido! Escolha novamente"); LineBreak1();
+						printf("-> ");
+						break;
+					}
+				}
+			}
+			
+			else {
+				printf("Por favor, digite um número -> ");
+			}
+		} while(loop != false);
+		}
 	}
+			
+}
 	
 	

@@ -14,15 +14,16 @@
 		char nome[50];
 		Telefone telefone;
 		char email[256];
+		int id;
 	} Contato;
 
 // Funções
 	
 	// Funções principais
-	void AdicionarContato(Contato *listaContatos, int *tamanho_lista);
-	void BuscarContato(Contato *listaContatos, int tamanho_lista);
-	void AtualizarContato();
-	void RemoverContato();
+	void AdicionarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta);
+	void BuscarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta);
+	void AtualizarContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta);
+	void RemoverContato(Contato *listaContatos, int *tamanho_lista, char *status, int *codigoDeResposta);
 
 	// Funções secundarias
 		// Funções de quebra de linha
@@ -38,5 +39,8 @@
 		
 		// Função para remover \n gerado pelo fgets
 		void removerNovaLinha(char *str);
+		
+		// Função para limpar o buffer do teclado
+		void limpar_buffer();
 
 #endif

@@ -28,6 +28,35 @@
     	 while ((c = getchar()) != '\n' && c != EOF);
 	}
 	
+	// Função para verificar se tem letra e se tem a quantidade máxima de numeros perimitida
+bool ENumeroValido(const char *entrada, int maximo_de_numeros) {
+    int len = strlen(entrada);
+
+    // Verifica se o comprimento da entrada não excede o máximo permitido
+    if (len > maximo_de_numeros) {
+        return false;
+    }
+    
+    // Verifica se a entrada contém apenas dígitos
+    size_t i;
+    for (i = 0; i < len; i++) {
+        if (!isdigit((unsigned char)entrada[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+	
+	// Verificador de valor de boolean
+	void printBoolean(bool value) {
+	    if (value) {
+	        printf("true\n");
+	    } else {
+	        printf("false\n");
+	    }
+	}
+
 	
 	// Função para verificar se é número, caso seja letra, altera o valor de letra para "true"
 	void VerificarSeNumero(char *digitado, bool *letra, int *valorRetornado) {
@@ -68,9 +97,9 @@
 
 	// Função para tirar o \n gerado pelo fgets
 	void removerNovaLinha(char *str) {
-	    size_t len = strcspn(str, "\n");
-	    if (str[len] == '\n') {
-	        str[len] = '\0';
+	    size_t len = strcspn(str, "\n"); 
+	    if (str[len] == '\n') {        
+	        str[len] = '\0';            
 	    }
 	}
 
@@ -82,6 +111,11 @@
 		   // Função removerNovaLinha, tira o \n do final das strings lidas pelo fgets.
 		   // LineBreak equivale a \n.
 		
+		// Booleanos que verificam a sintaxe da entrada de dados
+		bool sintaxe_pergunta_ddd = false;
+		bool sintaxe_pergunta_numero = false;
+		
+		
 		Contato contato;
 		
 		// Verifica de a lista já atingiu o tamanho máximo, caso seja true, cai no else.
@@ -92,16 +126,30 @@
 			removerNovaLinha(contato.nome);
 			LineBreak1();
 			
-			printf("Digite o DDD do telefone: ");
-			fflush(stdin);
-			fgets(contato.telefone.ddd, sizeof(contato.telefone.ddd), stdin);
-			removerNovaLinha(contato.telefone.ddd);
-			
-			printf("Digite o número do telefone: ");
-			fflush(stdin);
-			fgets(contato.telefone.numero, sizeof(contato.telefone.numero), stdin);
-			removerNovaLinha(contato.telefone.numero);
-			
+
+            while(sintaxe_pergunta_ddd == false){
+                printf("Digite o DDD do telefone: ");
+                fflush(stdin);
+                fgets(contato.telefone.ddd, sizeof(contato.telefone.ddd), stdin);
+                removerNovaLinha(contato.telefone.ddd);
+                sintaxe_pergunta_ddd = ENumeroValido(contato.telefone.ddd, 3);
+				int t = strlen(contato.telefone.ddd);
+                if(sintaxe_pergunta_ddd == false){
+                    printf("Por favor, digite números a não ultrapasse 3 digitos"); LineBreak1();
+                } 
+            }
+            
+            while(sintaxe_pergunta_numero == false) {
+				printf("Digite o número do telefone: ");
+				fflush(stdin);				
+				fgets(contato.telefone.numero, sizeof(contato.telefone.numero), stdin);
+				removerNovaLinha(contato.telefone.numero);
+				sintaxe_pergunta_numero = ENumeroValido(contato.telefone.numero, 9);	
+                if(sintaxe_pergunta_numero == false){
+                    printf("Por favor, digite números a não ultrapasse 9 digitos"); LineBreak1();
+                } 				
+				
+			}
 			printf("Digite o email do contato: ");
 			fflush(stdin);
 			fgets(contato.email, sizeof(contato.email), stdin);
@@ -235,6 +283,10 @@
 		strcpy(status, "");
 		int i, vef = 0, tam_array_contatos_encontrados = 0, ID, opc;
 		bool vef_atualizar = true;
+		
+		// Booleanos que verificam a sintaxe da entrada de dados
+		bool sintaxe_pergunta_ddd = false;
+		bool sintaxe_pergunta_numero = false;		
 		
 		// String que guarda o valor digitado pelo usuário
 		char busca[TAM_MAX];
@@ -370,16 +422,30 @@
 						break;
 					}
 					
-					case 2: {
-						printf("Digite o DDD atualizado: ");
-						fflush(stdin);
-						fgets(listaContatos[ID].telefone.ddd, sizeof(listaContatos[ID].telefone.ddd), stdin);
-						removerNovaLinha(listaContatos[ID].telefone.ddd);	
-						LineBreak1();
-						printf("Digite o número atualizado: ");
-						fflush(stdin);
-						fgets(listaContatos[ID].telefone.numero, sizeof(listaContatos[ID].telefone.numero), stdin);	
-						removerNovaLinha(listaContatos[ID].telefone.numero);	
+					case 2: {					
+						while(sintaxe_pergunta_ddd == false){
+							printf("Digite o DDD atualizado: ");
+							fflush(stdin);
+							fgets(listaContatos[ID].telefone.ddd, sizeof(listaContatos[ID].telefone.ddd), stdin);
+							removerNovaLinha(listaContatos[ID].telefone.ddd);	
+	                		sintaxe_pergunta_ddd = ENumeroValido(listaContatos[ID].telefone.ddd, 3);
+	                		if(sintaxe_pergunta_ddd == false){
+	                    	printf("Por favor, digite números e não ultrapasse 3 digitos"); LineBreak1();
+                			} 
+            			}
+												
+						while(sintaxe_pergunta_numero == false){
+							printf("Digite o número atualizado: ");
+							fflush(stdin);
+							fgets(listaContatos[ID].telefone.numero, sizeof(listaContatos[ID].telefone.numero), stdin);
+							removerNovaLinha(listaContatos[ID].telefone.numero);	
+	                		sintaxe_pergunta_numero = ENumeroValido(listaContatos[ID].telefone.numero, 10);
+	                		if(sintaxe_pergunta_numero == false){
+	                 		   	printf("Por favor, digite números e não ultrapasse 9 digitos"); LineBreak1();
+                			} 
+            			}
+						
+							
 						strcpy(status, "Contato atualizado!");	
 						*codigoDeResposta = 2;								
 						break;
@@ -399,6 +465,11 @@
 						vef_atualizar = false;
 						break;
 					}
+					
+					default: {
+						printf("Opção inválida!");
+						break;
+					}
 				}							
 			}
 		}
@@ -411,6 +482,8 @@
 		bool vef_atualizar = true, letra = false, loop = true;
 		
 		char apagaOuNao[TAM_MAX];
+		
+
 		
 		// String que guarda o valor digitado pelo usuário
 		char busca[TAM_MAX];

@@ -6,8 +6,8 @@
 
 	// Struct de contato
 	typedef struct{
-		char ddd[4];
-		char numero[10];
+		char ddd[5];
+		char numero[11];
 	}Telefone;
 	
 	typedef struct{
@@ -34,6 +34,9 @@
 		// Função para verificar se é número
 		void VerificarSeNumero(char *digitado, bool *letra, int *valorRetornado);
 		
+		// Função para verificar se é número e se tem o limite máximo de cacteres
+		bool ENumeroValido(const char *entrada, int maximo_de_numeros);
+		
 		// Função converter string para minusculo
 		void converter_minusculo(char *str);
 		
@@ -42,5 +45,8 @@
 		
 		// Função para limpar o buffer do teclado
 		void limpar_buffer();
+		
+		// Printar o tipo de retorno boolean
+		void printBoolean(bool value);
 
 #endif
